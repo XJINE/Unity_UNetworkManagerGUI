@@ -69,8 +69,11 @@ public class UNetworkManagerGUI : MonoBehaviour
             {
                 GUILayout.Label("Connection Settings");
 
-                addressGUI.Show();
-                portGUI.Show();
+                this.addressGUI.Value = UNetworkManager.singleton.networkAddress;
+                this.addressGUI.Show();
+
+                this.portGUI.Value = UNetworkManager.singleton.networkPort;
+                this.portGUI.Show();
 
                 GUILayout.Label("Start");
 
@@ -102,8 +105,8 @@ public class UNetworkManagerGUI : MonoBehaviour
                     GUILayout.Label(UNetworkManager.singleton.AutoStartIntervalTick.ToString("00.00"));
                 });
 
-                UNetworkManager.singleton.networkAddress = addressGUI.Value;
-                UNetworkManager.singleton.networkPort    = portGUI.Value;
+                UNetworkManager.singleton.networkAddress = this.addressGUI.Value;
+                UNetworkManager.singleton.networkPort    = this.portGUI.Value;
                 UNetworkManager.singleton.autoStart      = this.autoStartGUI.Value;
                 UNetworkManager.singleton.autoStartType  = this.autoStartTypeGUI.Value;
             }
