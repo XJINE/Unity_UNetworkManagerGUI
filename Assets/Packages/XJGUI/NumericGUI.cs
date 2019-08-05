@@ -10,70 +10,24 @@ namespace XJGUI
     {
         #region Field
 
+        protected T previousValue;
+
         protected string text;
 
         #endregion Field
 
         #region Property
 
-        public override T Value
-        {
-            get
-            {
-                return base.Value;
-            }
-            set
-            {
-                base.Value = CorrectValue(value);
-                this.text = base.Value.ToString();
-            }
-        }
-
-        public override T MinValue
-        {
-            get
-            {
-                return base.MinValue;
-            }
-            set
-            {
-                base.MinValue = value;
-                this.Value = base.Value;
-            }
-        }
-
-        public override T MaxValue
-        {
-            get
-            {
-                return base.MaxValue;
-            }
-            set
-            {
-                base.MaxValue = value;
-                this.Value = base.Value;
-            }
-        }
-
         protected override GUIStyle FieldStyle
         {
             get
             {
                 GUIStyle style = base.FieldStyle;
-
-                bool textIsCorrect = TextIsCorrect;
-
-                style.normal.textColor
-                = textIsCorrect ? GUI.skin.textField.normal.textColor
-                                : XJGUILayout.DefaultInvalidValueColor;
-
-                style.active.textColor
-                = textIsCorrect ? GUI.skin.textField.active.textColor
-                                : XJGUILayout.DefaultInvalidValueColor;
-
-                style.focused.textColor
-                = textIsCorrect ? GUI.skin.textField.focused.textColor
-                                : XJGUILayout.DefaultInvalidValueColor;
+                Color textColor = TextIsCorrect ? GUI.skin.textField.normal.textColor
+                                                : XJGUILayout.DefaultInvalidValueColor;
+                style.normal.textColor  = textColor;
+                style.active.textColor  = textColor;
+                style.focused.textColor = textColor;
 
                 return style;
             }
@@ -89,16 +43,20 @@ namespace XJGUI
 
         public NumericGUI(string title) : base(title) { }
 
-        public NumericGUI(string title, T value) : base(title, value) { }
-
-        public NumericGUI(string title, T value, T min, T max) : base(title, value, min, max) { }
+        public NumericGUI(string title, T min, T max) : base(title, min, max) { }
 
         #endregion Constructor
 
         #region Method
 
-        public override T Show()
+        public override T Show(T value)
         {
+            T valueT = value;
+
+            this.text = this.text ?? valueT.ToString();
+            this.text = this.previousValue.Equals(valueT) ?
+                        this.text : valueT.ToString();
+
             XJGUILayout.VerticalLayout(() =>
             {
                 XJGUILayout.HorizontalLayout(() =>
@@ -111,15 +69,13 @@ namespace XJGUI
                     // float.TryParse("0.") return true.
                     // But need to keep user input text, because the user may input "0.x~".
 
-                    float textValue;
-
-                    if (float.TryParse(this.text, out textValue))
+                    if (float.TryParse(this.text, out float textValue))
                     {
-                        base.Value = (T)Convert.ChangeType(textValue, typeof(T));
+                        valueT = (T)Convert.ChangeType(textValue, typeof(T));
                     }
                 });
 
-                if (!base.WithSlider)
+                if (!base.Slider)
                 {
                     return;
                 }
@@ -127,21 +83,24 @@ namespace XJGUI
                 // NOTE:
                 // Need to update text when the value is updated with Slider.
 
-                float value    = (float)Convert.ChangeType(base.Value,    typeof(float));
-                float minValue = (float)Convert.ChangeType(base.MinValue, typeof(float));
-                float maxValue = (float)Convert.ChangeType(base.MaxValue, typeof(float));
+                float floatValue = (float)Convert.ChangeType(valueT,        typeof(float));
+                float minValue   = (float)Convert.ChangeType(base.MinValue, typeof(float));
+                float maxValue   = (float)Convert.ChangeType(base.MaxValue, typeof(float));
 
-                float sliderValue = GUILayout.HorizontalSlider(value, minValue, maxValue);
+                float sliderValue = GUILayout.HorizontalSlider(floatValue, minValue, maxValue);
 
-                T sliderValueT = (T)Convert.ChangeType(sliderValue, typeof(T));
+                T sliderValueT = CorrectValue((T)Convert.ChangeType(sliderValue, typeof(T)));
 
-                if (!sliderValueT.Equals(base.Value))
+                if (!sliderValueT.Equals(valueT))
                 {
-                    this.Value = sliderValueT;
+                    valueT = sliderValueT;
+                    this.text = valueT.ToString();
                 }
             });
 
-            return base.Value;
+            this.previousValue = valueT;
+
+            return valueT;
         }
 
         protected virtual T CorrectValue(T value)

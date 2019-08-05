@@ -14,27 +14,6 @@ namespace XJGUI
 
         #region Property
 
-        public override Vector3 Value
-        {
-            get
-            {
-                return base.Value;
-            }
-            set
-            {
-                this.floatGUIX.Value = value.x;
-                this.floatGUIY.Value = value.y;
-                this.floatGUIZ.Value = value.z;
-
-                base.Value = new Vector3()
-                {
-                    x = this.floatGUIX.Value,
-                    y = this.floatGUIY.Value,
-                    z = this.floatGUIZ.Value
-                };
-            }
-        }
-
         public override Vector3 MinValue
         {
             get
@@ -87,31 +66,31 @@ namespace XJGUI
             }
         }
 
-        public override float FieldWidth
+        public override float Width
         {
             get
             {
-                return this.floatGUIX.FieldWidth;
+                return this.floatGUIX.Width;
             }
             set
             {
-                this.floatGUIX.FieldWidth = value;
-                this.floatGUIY.FieldWidth = value;
-                this.floatGUIZ.FieldWidth = value;
+                this.floatGUIX.Width = value;
+                this.floatGUIY.Width = value;
+                this.floatGUIZ.Width = value;
             }
         }
 
-        public override bool WithSlider
+        public override bool Slider
         {
             get
             {
-                return this.floatGUIX.WithSlider;
+                return this.floatGUIX.Slider;
             }
             set
             {
-                this.floatGUIX.WithSlider = value;
-                this.floatGUIY.WithSlider = value;
-                this.floatGUIZ.WithSlider = value;
+                this.floatGUIX.Slider = value;
+                this.floatGUIY.Slider = value;
+                this.floatGUIZ.Slider = value;
             }
         }
 
@@ -123,9 +102,7 @@ namespace XJGUI
 
         public Vector3GUI(string title) : base(title) { }
 
-        public Vector3GUI(string title, Vector3 value) : base(title, value) { }
-
-        public Vector3GUI(string title, Vector3 value, Vector3 min, Vector3 max) : base(title, value, min, max) { }
+        public Vector3GUI(string title, Vector3 min, Vector3 max) : base(title, min, max) { }
 
         #endregion Constructor
 
@@ -137,16 +114,15 @@ namespace XJGUI
 
             this.MinValue = XJGUILayout.DefaultMinValueVector3;
             this.MaxValue = XJGUILayout.DefaultMaxValueVector3;
-            this.Value    = XJGUILayout.DefaultValueVector3;
         }
 
-        protected override void ShowComponents()
+        protected override Vector3 ShowComponents(Vector3 value)
         {
-            this.Value = new Vector3()
+            return new Vector3()
             {
-                x = this.floatGUIX.Show(),
-                y = this.floatGUIY.Show(),
-                z = this.floatGUIZ.Show()
+                x = this.floatGUIX.Show(value.x),
+                y = this.floatGUIY.Show(value.y),
+                z = this.floatGUIZ.Show(value.z)
             };
         }
 

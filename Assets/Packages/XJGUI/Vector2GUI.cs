@@ -13,25 +13,6 @@ namespace XJGUI
 
         #region Property
 
-        public override Vector2 Value
-        {
-            get
-            {
-                return base.Value;
-            }
-            set
-            {
-                this.floatGUIX.Value = value.x;
-                this.floatGUIY.Value = value.y;
-
-                base.Value = new Vector2()
-                {
-                    x = this.floatGUIX.Value,
-                    y = this.floatGUIY.Value
-                };
-            }
-        }
-
         public override Vector2 MinValue
         {
             get
@@ -79,29 +60,29 @@ namespace XJGUI
             }
         }
 
-        public override float FieldWidth
+        public override float Width
         {
             get
             {
-                return this.floatGUIX.FieldWidth;
+                return this.floatGUIX.Width;
             }
             set
             {
-                this.floatGUIX.FieldWidth = value;
-                this.floatGUIY.FieldWidth = value;
+                this.floatGUIX.Width = value;
+                this.floatGUIY.Width = value;
             }
         }
 
-        public override bool WithSlider
+        public override bool Slider
         {
             get
             {
-                return this.floatGUIX.WithSlider;
+                return this.floatGUIX.Slider;
             }
             set
             {
-                this.floatGUIX.WithSlider = value;
-                this.floatGUIY.WithSlider = value;
+                this.floatGUIX.Slider = value;
+                this.floatGUIY.Slider = value;
             }
         }
 
@@ -113,9 +94,7 @@ namespace XJGUI
 
         public Vector2GUI(string title) : base(title) { }
 
-        public Vector2GUI(string title, Vector2 value) : base (title, value) { }
-
-        public Vector2GUI(string title, Vector2 value, Vector2 min, Vector2 max) : base(title, value, min, max) { }
+        public Vector2GUI(string title, Vector2 min, Vector2 max) : base(title, min, max) { }
 
         #endregion Constructor
 
@@ -127,15 +106,14 @@ namespace XJGUI
 
             this.MinValue = XJGUILayout.DefaultMinValueVector2;
             this.MaxValue = XJGUILayout.DefaultMaxValueVector2;
-            this.Value    = XJGUILayout.DefaultValueVector2;
         }
 
-        protected override void ShowComponents()
+        protected override Vector2 ShowComponents(Vector2 value)
         {
-            this.Value = new Vector2()
+            return new Vector2()
             {
-                x = this.floatGUIX.Show(),
-                y = this.floatGUIY.Show()
+                x = this.floatGUIX.Show(value.x),
+                y = this.floatGUIY.Show(value.y)
             };
         }
 

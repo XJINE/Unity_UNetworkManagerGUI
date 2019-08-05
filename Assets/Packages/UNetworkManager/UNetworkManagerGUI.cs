@@ -5,12 +5,12 @@ public class UNetworkManagerGUI : MonoBehaviour
 {
     #region Field
 
-    public KeyCode toggleIsVisibleKey = KeyCode.N;
+    public KeyCode toggleVisibility = KeyCode.N;
 
-    private FlexibleWindow flexibleWindow;
-    private IPv4GUI addressGUI;
-    private IntGUI  portGUI;
-    private BoolGUI autoStartGUI;
+    private FlexWindow flexibleWindow;
+    private IPv4GUI    ipV4GUI;
+    private IntGUI     portGUI;
+    private BoolGUI    autoStartGUI;
     private EnumGUI<UNetworkManager.UNetType> autoStartTypeGUI;
 
     #endregion Field
@@ -19,43 +19,21 @@ public class UNetworkManagerGUI : MonoBehaviour
 
     protected virtual void Start()
     {
-        this.flexibleWindow = new FlexibleWindow()
+        this.flexibleWindow = new FlexWindow()
         {
             Title     = "UNET",
             IsVisible = false
         };
 
-        this.addressGUI = new IPv4GUI()
-        {
-            Title = "Address",
-            Value = UNetworkManager.singleton.networkAddress,
-        };
-
-        this.portGUI = new IntGUI()
-        {
-            Title      = "Port",
-            MinValue   = 0,
-            MaxValue   = 65535,
-            WithSlider = false,
-            Value      = UNetworkManager.singleton.networkPort,
-        };
-
-        this.autoStartGUI = new BoolGUI()
-        {
-            Title = "Auto Start",
-            Value = UNetworkManager.singleton.autoStart
-        };
-
-        this.autoStartTypeGUI = new EnumGUI<UNetworkManager.UNetType>()
-        {
-            Title = "Auto Start Type",
-            Value = UNetworkManager.singleton.autoStartType
-        };
+        this.ipV4GUI      = new IPv4GUI() { Title = "Address" };
+        this.portGUI      = new IntGUI()  { Title = "Port", MinValue = 0, MaxValue = 65535, Slider = false };
+        this.autoStartGUI = new BoolGUI() { Title = "Auto Start" };
+        this.autoStartTypeGUI = new EnumGUI<UNetworkManager.UNetType>() { Title = "Auto Start Type" };
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(this.toggleIsVisibleKey))
+        if (Input.GetKeyDown(this.toggleVisibility))
         {
             this.flexibleWindow.IsVisible = !this.flexibleWindow.IsVisible;
         }
@@ -69,11 +47,8 @@ public class UNetworkManagerGUI : MonoBehaviour
             {
                 GUILayout.Label("Connection Settings");
 
-                this.addressGUI.Value = UNetworkManager.singleton.networkAddress;
-                this.addressGUI.Show();
-
-                this.portGUI.Value = UNetworkManager.singleton.networkPort;
-                this.portGUI.Show();
+                UNetworkManager.singleton.networkAddress = this.ipV4GUI.Show(UNetworkManager.singleton.networkAddress);
+                UNetworkManager.singleton.networkPort    = this.portGUI.Show(UNetworkManager.singleton.networkPort);
 
                 GUILayout.Label("Start");
 
@@ -95,8 +70,8 @@ public class UNetworkManagerGUI : MonoBehaviour
                     };
                 });
 
-                this.autoStartGUI.Show();
-                this.autoStartTypeGUI.Show();
+                UNetworkManager.singleton.autoStart     = this.autoStartGUI.Show(UNetworkManager.singleton.autoStart);
+                UNetworkManager.singleton.autoStartType = this.autoStartTypeGUI.Show(UNetworkManager.singleton.autoStartType);
 
                 XJGUILayout.HorizontalLayout(() =>
                 {
@@ -104,11 +79,6 @@ public class UNetworkManagerGUI : MonoBehaviour
                     GUILayout.FlexibleSpace();
                     GUILayout.Label(UNetworkManager.singleton.AutoStartIntervalTick.ToString("00.00"));
                 });
-
-                UNetworkManager.singleton.networkAddress = this.addressGUI.Value;
-                UNetworkManager.singleton.networkPort    = this.portGUI.Value;
-                UNetworkManager.singleton.autoStart      = this.autoStartGUI.Value;
-                UNetworkManager.singleton.autoStartType  = this.autoStartTypeGUI.Value;
             }
 
             else

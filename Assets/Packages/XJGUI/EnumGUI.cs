@@ -17,15 +17,9 @@ namespace XJGUI
     // Even if the string value shows "EnumA", Enum.Parse returns EnumB.
     // I try to use Reflection, but the result was not good.
 
-    public class EnumGUI<T> : Element<T> where T : IComparable, IFormattable, IConvertible
+    public class EnumGUI<T> : Element<T> where T : Enum
     {
         #region Field
-
-        protected Type enumType;
-
-        protected string[] enumNames;
-
-        protected int selectedIndex;
 
         protected bool isEditing;
 
@@ -33,20 +27,7 @@ namespace XJGUI
 
         #region Property
 
-        public override T Value
-        {
-            get
-            {
-                return base.Value;
-            }
-            set
-            {
-                this.selectedIndex = GetSelectedEnumIndex(value);
-                base.Value = value;
-            }
-        }
-
-        public float ButtonWidth { get; set; }
+        public float Width { get; set; }
 
         protected GUIStyle ButtonStyle
         {
@@ -65,7 +46,7 @@ namespace XJGUI
         
         protected GUILayoutOption ButtonLayout
         {
-            get { return this.ButtonWidth <= 0 ? null : GUILayout.Width(this.ButtonWidth); }
+            get { return this.Width <= 0 ? null : GUILayout.Width(this.Width); }
         }
 
         #endregion Property
@@ -76,8 +57,6 @@ namespace XJGUI
 
         public EnumGUI(string title) : base(title) { }
 
-        public EnumGUI(string title, T value) : base(title, value) { }
-
         #endregion Constructor
 
         #region Method
@@ -85,31 +64,25 @@ namespace XJGUI
         protected override void Initialize()
         {
             base.Initialize();
-
-            this.ButtonWidth = XJGUILayout.DefaultButtonWidth;
-
-            this.enumType = typeof(T);
-
-            if (!this.enumType.IsEnum)
-            {
-                // Exception.
-            }
-
-            this.enumNames = Enum.GetNames(this.enumType);
+            this.Width = XJGUILayout.DefaultWidth;
         }
 
-        public override T Show()
+        public override T Show(T value)
         {
+            Type     enumType  = value.GetType();
+            string[] enumNames = Enum.GetNames(enumType);
+            int selectedIndex  = GetSelectedIndex(value, enumNames);
+
             XJGUILayout.HorizontalLayout(() =>
             {
                 base.ShowTitle();
 
-                if (this.ButtonWidth > 0)
+                if (this.Width > 0)
                 {
                     GUILayout.FlexibleSpace();
                 }
 
-                if (GUILayout.Button(this.enumNames[this.selectedIndex],
+                if (GUILayout.Button(enumNames[selectedIndex],
                                      this.ButtonStyle,
                                      this.ButtonLayout))
                 {
@@ -119,46 +92,45 @@ namespace XJGUI
 
             if (!this.isEditing)
             {
-                return Value;
+                return value;
             }
 
             XJGUILayout.HorizontalLayout(() =>
             {
-                if(this.ButtonWidth > 0)
+                if(this.Width > 0)
                 {
                     GUILayout.FlexibleSpace();
                 }
 
                 XJGUILayout.VerticalLayout(() =>
                 {
-                    for (int i = 0; i < this.enumNames.Length; i++)
+                    for (int i = 0; i < enumNames.Length; i++)
                     {
-                        if (i == this.selectedIndex)
+                        if (i == selectedIndex)
                         {
                             continue;
                         }
 
-                        if (GUILayout.Button(this.enumNames[i], ButtonLayout))
+                        if (GUILayout.Button(enumNames[i], ButtonLayout))
                         {
-                            this.selectedIndex = i;
                             this.isEditing = false;
-                            base.Value = (T)Enum.Parse(this.enumType, this.enumNames[i]);
+                            value = (T)Enum.Parse(enumType, enumNames[i]);
                         }
                     }
 
                 }, GUI.skin.box);
             });
 
-            return this.Value;
+            return value;
         }
 
-        protected int GetSelectedEnumIndex(T value)
+        protected int GetSelectedIndex(Enum value, string[] enumNames)
         {
             string enumName = value.ToString();
 
-            for (int i = 0; i < this.enumNames.Length; i++)
+            for (int i = 0; i < enumNames.Length; i++)
             {
-                if (this.enumNames[i] == enumName)
+                if (enumNames[i] == enumName)
                 {
                     return i;
                 }

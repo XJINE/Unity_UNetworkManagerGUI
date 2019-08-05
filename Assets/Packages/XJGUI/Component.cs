@@ -6,9 +6,17 @@ namespace XJGUI
     {
         #region Property
 
-        protected virtual GUIStyle TitleStyle
+        // NOTE:
+        // GUIStyle and GUI.skin are accessible in OnGUI().
+
+        private static GUIStyle titleStyle;
+        protected static GUIStyle TitleStyle
         {
-            get { return new GUIStyle(GUI.skin.label); }
+            get
+            {
+                titleStyle = titleStyle ?? new GUIStyle(GUI.skin.label);
+                return titleStyle;
+            }
         }
 
         #endregion Property
@@ -18,8 +26,6 @@ namespace XJGUI
         public Component() : base() { }
 
         public Component(string title) : base(title) { }
-
-        public Component(string title, T value) : base(title, value) { }
 
         #endregion Constructor
 

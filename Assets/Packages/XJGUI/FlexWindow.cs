@@ -3,15 +3,27 @@ using UnityEngine;
 
 namespace XJGUI
 {
-    public class FlexibleWindow : BaseGUI<Rect>
+    // NOTE:
+    // FlexibleWindow is not an inheritance of Component class
+    // because it doesn't need ShowTitle().
+
+    public class FlexWindow : BaseGUI<Rect>
     {
         #region Field
+
+        protected Rect value;
 
         private float previousShowTime;
 
         #endregion Field
 
         #region Property
+
+        public Vector2 Position
+        {
+            get { return new Vector2(this.value.x, this.value.y); }
+            set { this.value.x = value.x; this.value.y = value.y; }
+        }
 
         public int   ID          { get; private set; }
         public float MinWidth    { get; set; }
@@ -25,11 +37,9 @@ namespace XJGUI
 
         #region Constructor
 
-        public FlexibleWindow() : base() { }
+        public FlexWindow() : base() { }
 
-        public FlexibleWindow(string title) : base(title) { }
-
-        public FlexibleWindow(string title, Rect value) : base(title, value) { }
+        public FlexWindow(string title) : base(title) { }
 
         #endregion Constructor
 
@@ -57,7 +67,7 @@ namespace XJGUI
         {
             if (!this.IsVisible)
             {
-                return new Rect(base.Value.position.x, base.Value.position.y, 0, 0);
+                return new Rect(this.value.position.x, this.value.position.y, 0, 0);
             }
 
             GUI.WindowFunction windowFunction = (int windowID) =>
@@ -85,12 +95,12 @@ namespace XJGUI
 
             if (this.previousShowTime != Time.timeSinceLevelLoad)
             {
-                base.Value = new Rect(base.Value.x, base.Value.y, 0, 0);
+                this.value = new Rect(this.value.x, this.value.y, 0, 0);
                 this.previousShowTime = Time.timeSinceLevelLoad;
             }
 
-            base.Value = GUILayout.Window(this.ID,
-                                          base.Value,
+            this.value = GUILayout.Window(this.ID,
+                                          this.value,
                                           windowFunction,
                                           base.Title,
                                           GUILayout.MinWidth (this.MinWidth),
@@ -98,7 +108,7 @@ namespace XJGUI
                                           GUILayout.MaxWidth (this.MaxWidth),
                                           GUILayout.MaxHeight(this.MaxHeight));
 
-            return base.Value;
+            return this.value;
         }
 
         #endregion Method
